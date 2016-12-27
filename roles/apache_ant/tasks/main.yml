@@ -1,0 +1,38 @@
+---
+# The playbook for Ant tasks
+
+- name: Download and Unarchive the compressed Ant binaries
+  become: yes
+  remote_user: itspp
+  unarchive:
+    src: http://apache.rediris.es/ant/binaries/apache-ant-1.9.7-bin.tar.gz
+    dest: /usr/local 
+    creates: /usr/local/apache-ant-1.9.7
+    remote_src: True
+
+- name: Update the symbolic link to the Ant install
+  become: yes
+  file:
+    path: /usr/local/ant
+    src: /usr/local/apache-ant-1.9.7
+    state: link
+    force: yes
+  
+- name: Set ANT_HOME environment variable
+  become: yes
+  lineinfile:
+    dest: /etc/environment
+    regexp: '^ANT_HOME.*'
+    line: 'ANT_HOME=/usr/local/ant'
+    insertbefore: '^PATH.*'
+
+- name: Add Ant binaries to PATH environment variable
+  become: yes
+  lineinfile:
+    dest: /etc/environment
+    state: present 
+    backrefs: yes
+    regexp: 'PATH=(["]*)((?!.*?/usr/local/ant/bin).*?)(["]*)$'
+    line: 'PATH=\1\2:/usr/local/ant/bin\3'
+
+  

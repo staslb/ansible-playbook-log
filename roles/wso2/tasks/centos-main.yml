@@ -1,0 +1,21 @@
+# tasks file for klousiaj.wso2-das - centOS specific tasks
+
+### On CentOS we use firewalld.
+- name: check that firewalld is running
+  become: yes
+  become_method: sudo
+  service:
+    name: firewalld
+    enabled: yes
+    
+- name: update the firewall rules to allow access over the specified port
+  become: yes
+  become_method: sudo
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - "{{ wso2_app_http_port }}"
+    - "{{ wso2_app_https_port }}"

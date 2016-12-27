@@ -1,0 +1,52 @@
+---
+- name: Grep and register current user name
+  shell: 'whoami'
+  changed_when: false
+  register: user_name
+
+- name: debug output
+  debug: var=user_name.stdout
+
+- name: Creating aditional folders
+  file: path=/home/{{ user_name.stdout }}/{{ item }} state=directory mode=0755
+  with_items:
+    - apache_conf
+    - apache_log
+    - apache_template
+
+- name: Copying files
+  copy:
+    src: "{{ item.file }}"
+    dest: /home/{{ user_name.stdout }}/{{ item.folder }}/{{ item.file }}
+    owner: "{{ user_name.stdout }}"
+    group: "{{ user_name.stdout }}"
+    mode: 0644
+  with_items:
+    - { folder: 'apache_conf', file: 'apache.conf' }
+    - { folder: 'apache_log', file: 'apache.log' }
+    - { folder: 'apache_template', file: 'apache-template.json' }
+
+- name: Configuring Logstash conf file
+  replace:
+    dest: /home/{{ user_name.stdout }}/apache_conf/apache.conf
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+    backup: yes
+  with_items:
+    - {regexp: 'path => *', replace: 'path => "/home/{{ user_name.stdout }}/apache_log/apache.log"'}
+    - {regexp: 'template => *', replace: 'template => "/home/{{ user_name.stdout }}/apache_template/apache-template.json"'}
+
+- name: Creating directory for program
+  file: path=/home/{{ user_name.stdout }}/{{ item }} state=directory mode=0755
+  with_items:
+    - elasticsearch
+    - kibana
+    - logstash
+
+- name: install unzip
+  become: yes
+  become_method: sudo
+  apt: 
+    name: unzip
+    update_cache: yes
+    state: latest

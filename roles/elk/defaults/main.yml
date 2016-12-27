@@ -1,0 +1,4 @@
+  elk_packages:
+    - { package: 'elasticsearch', version: '5.1.1', bit: '' }
+    - { package: 'logstash', version: '5.1.1', bit: '' }
+    - { package: 'kibana', version: '5.1.1', bit: '-linux-x86_64' }

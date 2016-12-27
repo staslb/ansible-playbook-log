@@ -1,0 +1,21 @@
+---
+# defaults file for klousiaj.wso2-das
+wso2_user: wso2
+carbon_base: "/opt/wso2/{{wso2_app}}"
+carbon_home: "{{carbon_base}}/current"
+
+# these are the default ports for wso2 products
+wso2_default_https_port: 9443
+wso2_default_http_port: 9763
+
+#the following is written into the init.d file for the service
+java_home: "/usr/java/default"
+
+# wso2
+wso2_app: wso2das
+wso2_app_version: 3.1.0
+wso2_app_directory: "{{wso2_app}}-{{ wso2_app_version }}"
+wso2_app_offset: 0
+wso2_app_https_port: "{{ (wso2_default_https_port|int) + (wso2_app_offset|int) }}"
+wso2_app_http_port: "{{ (wso2_default_http_port|int) + (wso2_app_offset|int) }}"
+wso2_app_archive: "{{wso2_app}}-{{wso2_app_version}}.zip"

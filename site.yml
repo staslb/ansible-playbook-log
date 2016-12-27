@@ -1,0 +1,10 @@
+---
+- name: "Setup Log server"
+  hosts: log1
+
+  roles:
+    - common
+    - elk
+    - java
+    - wso2
+    - apache_ant

@@ -1,0 +1,20 @@
+---
+
+- name: Download ELK packages
+  get_url:
+    url: https://artifacts.elastic.co/downloads/{{ item.package }}/{{ item.package }}-{{ item.version }}{{ item.bit }}.tar.gz
+    dest: /tmp/{{ item.package }}-{{ item.version }}{{ item.bit }}.tar.gz
+    force_basic_auth: yes
+  with_items:
+    - "{{elk_packages}}"
+
+- name: "Unpack ELK tar.gz packages"
+  shell: tar -xvf /tmp/{{ item.package }}-{{ item.version }}{{ item.bit }}.tar.gz -C /home/{{ user_name.stdout }}/{{ item.package }} --strip-components=1
+  with_items:
+    - "{{elk_packages}}"
+
+- name: Configure Kibana config file
+  lineinfile: 
+    dest: /home/{{ user_name.stdout }}/kibana/config/kibana.yml
+    line: 'server.host: "0.0.0.0"'
+
